@@ -1,10 +1,10 @@
-package com.fmar.travelrhythm;
+package com.travelrhythm;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TravelrhythmApplicationTests {
+class TravelRhythmApplicationTests {
 
 	@Test
 	void contextLoads() {

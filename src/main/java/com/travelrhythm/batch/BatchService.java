@@ -2,9 +2,11 @@ package com.travelrhythm.batch;
 
 import com.travelrhythm.domain.entity.Place;
 import com.travelrhythm.domain.entity.PlaceBigCategory;
+import com.travelrhythm.domain.entity.PlaceDetail;
 import com.travelrhythm.domain.entity.PlaceSmallCategory;
 import com.travelrhythm.domain.entity.Region;
 import com.travelrhythm.domain.repository.PlaceBigCategoryRepository;
+import com.travelrhythm.domain.repository.PlaceDetailRepository;
 import com.travelrhythm.domain.repository.PlaceRepository;
 import com.travelrhythm.domain.repository.PlaceSmallCategoryRepository;
 import com.travelrhythm.domain.repository.RegionRepository;
@@ -28,6 +30,8 @@ public class BatchService {
   private RegionRepository regionRepository;
   @Autowired
   private PlaceRepository placeRepository;
+  @Autowired
+  private PlaceDetailRepository placeDetailRepository;
   @Autowired
   private PlaceBigCategoryRepository placeBigCategoryRepository;
   @Autowired
@@ -85,6 +89,40 @@ public class BatchService {
       log.error(e.getMessage());
     }
     placeRepository.saveAll(placeListForSave);
+  }
+
+  @Transactional
+  public void addPoiDetailDataByNaver() {
+    List<Place> placeList = placeRepository.findTop100ByPlaceDetailOrderById(null);
+
+    for (Place place: placeList) {
+      log.info("addPoiDetailDataByNaver REQ : {}, {}", place.getId(), place.getName());
+      String responseValue = httpUtil.findPoiDetailDataByNaver(place.getName());
+      log.info("addPoiDetailDataByNaver RES : {}", responseValue);
+
+      try {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObj = (JSONObject) jsonParser.parse(responseValue);
+        JSONObject resultObj = (JSONObject) jsonParser.parse(jsonObj.get("result").toString());
+        JSONObject placeObj = (JSONObject) jsonParser.parse(resultObj.get("place").toString());
+        JSONObject dataObj = (JSONObject) ((JSONArray) placeObj.get("list")).get(0);
+
+        PlaceDetail placeDetail = new PlaceDetail();
+        placeDetail.setData(dataObj.toString());
+        placeDetail.setNaverId(dataObj.get("id").toString());
+        placeDetail.setPosExact(dataObj.get("posExact").toString());
+        placeDetail.setX(dataObj.get("x").toString());
+        placeDetail.setY(dataObj.get("y").toString());
+        placeDetailRepository.save(placeDetail);
+
+        place.setPlaceDetail(placeDetail);
+        placeRepository.save(place);
+      } catch (ParseException e) {
+        log.error(e.getMessage());
+      } catch (Exception e) {
+        log.error(e.getMessage());
+      }
+    }
   }
 
 }

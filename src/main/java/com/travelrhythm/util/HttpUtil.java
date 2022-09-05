@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class HttpUtil {
 
   private final String DATALAB_API_END_POINT = "https://datalab.visitkorea.or.kr";
+  private final String NAVER_API_FIND_PLACE_URL = "https://map.naver.com/v5/api/search";
 
   @Autowired
   private RestTemplate restTemplate;
@@ -39,7 +40,26 @@ public class HttpUtil {
     return postInterface(DATALAB_API_END_POINT + "/visualize/getTempleteData.do", map);
   }
 
+  public String findPoiDetailDataByNaver(String placeName) {
+    // TODO Exception 처리
+    try {
+      String basicParams = "?caller=pcweb&type=all&page=1&displayCount=1&isPlaceRecommendationReplace=true&lang=ko";
+
+      ResponseEntity<String> response = restTemplate.getForEntity(
+          NAVER_API_FIND_PLACE_URL + basicParams + "&query=" + placeName
+          , String.class);
+
+      if (response.getStatusCodeValue() != 200) {
+        throw new HttpException();
+      }
+      return response.getBody();
+    } catch (Exception e) {
+      return e.getMessage();
+    }
+  }
+
   private String postInterface(String path, MultiValueMap dto) {
+    // TODO Exception 처리
     try {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

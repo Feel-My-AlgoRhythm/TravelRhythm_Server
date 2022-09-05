@@ -42,6 +42,7 @@ public class Place {
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "detail_id", referencedColumnName = "place_detail_id")
   private PlaceDetail placeDetail;
+  // TODO detail 요청 횟수 제한? 검색 결과가 없는 경우와 응답코드 5xx 분기 필요
 
   @Override
   public boolean equals(Object o) {

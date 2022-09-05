@@ -1,5 +1,6 @@
 package com.travelrhythm.config;
 
+import com.travelrhythm.batch.job.AddPoiDetailDataByNaverJob;
 import com.travelrhythm.batch.job.FindPoisByDatalabJob;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
@@ -13,11 +14,11 @@ import org.springframework.context.annotation.Configuration;
 public class QuartzConfig {
 
   @Bean
-  public Trigger findPoisByDatalabTrigger(JobDetail checkDealerAgreementDetail) {
-    return TriggerBuilder.newTrigger().forJob(checkDealerAgreementDetail)
+  public Trigger findPoisByDatalabTrigger(JobDetail findPoisByDatalabDetail) {
+    return TriggerBuilder.newTrigger().forJob(findPoisByDatalabDetail)
         .withIdentity("Find_Pois_By_Datalab_Trigger")
         .withDescription("Find_Pois_By_Datalab_Trigger")
-        .withSchedule(CronScheduleBuilder.cronSchedule("0/30 * * * * ?"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/3 * * * ?"))
         .build();
   }
 
@@ -27,6 +28,24 @@ public class QuartzConfig {
         .storeDurably()
         .withIdentity("Find_Pois_By_Datalab_Detail")
         .withDescription("Find_Pois_By_Datalab_Detail")
+        .build();
+  }
+
+  @Bean
+  public Trigger addPoiDetailDataByNaverTrigger(JobDetail addPoiDetailDataByNaverDetail) {
+    return TriggerBuilder.newTrigger().forJob(addPoiDetailDataByNaverDetail)
+        .withIdentity("Add_Poi_Detail_Data_By_Naver_Trigger")
+        .withDescription("Add_Poi_Detail_Data_By_Naver_Trigger")
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/30 * * * ?"))
+        .build();
+  }
+
+  @Bean
+  public JobDetail addPoiDetailDataByNaverDetail() {
+    return JobBuilder.newJob().ofType(AddPoiDetailDataByNaverJob.class)
+        .storeDurably()
+        .withIdentity("Add_Poi_Detail_Data_By_Naver_Detail")
+        .withDescription("Add_Poi_Detail_Data_By_Naver_Detail")
         .build();
   }
 

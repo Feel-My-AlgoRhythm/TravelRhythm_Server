@@ -17,8 +17,8 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class HttpUtil {
 
-  private final String DATALAB_API_END_POINT = "https://datalab.visitkorea.or.kr";
-  private final String NAVER_API_FIND_PLACE_URL = "https://map.naver.com/v5/api/search";
+  private final String DATALAB_API_PRERIX = "https://datalab.visitkorea.or.kr";
+  private final String NAVER_MAP_SEARCH_API_PREFIX = "https://map.naver.com/v5/api/search";
 
   @Autowired
   private RestTemplate restTemplate;
@@ -37,16 +37,17 @@ public class HttpUtil {
     map.add("srchAreaDate", "1");
     map.add("qid", "BDT_03_04_003");
 
-    return postInterface(DATALAB_API_END_POINT + "/visualize/getTempleteData.do", map);
+    return postInterface(DATALAB_API_PRERIX + "/visualize/getTempleteData.do", map);
   }
 
   public String findPoiDetailDataByNaver(String placeName) {
     // TODO Exception 처리
+    // TODO detail 요청 횟수 제한? 검색 결과가 없는 경우와 응답코드 5xx 분기 필요
     try {
       String basicParams = "?caller=pcweb&type=all&page=1&displayCount=1&isPlaceRecommendationReplace=true&lang=ko";
 
       ResponseEntity<String> response = restTemplate.getForEntity(
-          NAVER_API_FIND_PLACE_URL + basicParams + "&query=" + placeName
+          NAVER_MAP_SEARCH_API_PREFIX + basicParams + "&query=" + placeName
           , String.class);
 
       if (response.getStatusCodeValue() != 200) {

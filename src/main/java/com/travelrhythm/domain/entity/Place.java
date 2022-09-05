@@ -1,6 +1,7 @@
 package com.travelrhythm.domain.entity;
 
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,6 +39,9 @@ public class Place {
   @OneToOne
   @JoinColumn(name = "small_category_id", nullable = false, referencedColumnName = "place_small_category_id")
   private PlaceSmallCategory placeSmallCategory;
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "detail_id", referencedColumnName = "place_detail_id")
+  private PlaceDetail placeDetail;
 
   @Override
   public boolean equals(Object o) {

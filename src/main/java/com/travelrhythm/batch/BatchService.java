@@ -93,7 +93,7 @@ public class BatchService {
 
   @Transactional
   public void addPoiDetailDataByNaver() {
-    List<Place> placeList = placeRepository.findTop250ByPlaceDetailOrderById(null);
+    List<Place> placeList = placeRepository.findTop250ByPlaceDetailOrderByIdDesc(null);
 
     for (Place place: placeList) {
       log.info("addPoiDetailDataByNaver REQ : {}, {}", place.getId(), place.getName());

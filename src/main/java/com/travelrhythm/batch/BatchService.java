@@ -108,7 +108,7 @@ public class BatchService {
         JSONObject dataObj = (JSONObject) ((JSONArray) placeObj.get("list")).get(0);
 
         PlaceDetail placeDetail = new PlaceDetail();
-        placeDetail.setData(dataObj.toString());
+        placeDetail.setData(dataObj);
         placeDetail.setNaverId(dataObj.get("id").toString());
         placeDetail.setPosExact(dataObj.get("posExact").toString());
         placeDetail.setX(dataObj.get("x").toString());

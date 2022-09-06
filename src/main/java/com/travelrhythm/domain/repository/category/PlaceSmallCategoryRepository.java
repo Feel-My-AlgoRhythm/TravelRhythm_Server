@@ -1,4 +1,4 @@
-package com.travelrhythm.domain.repository;
+package com.travelrhythm.domain.repository.category;
 
 import com.travelrhythm.domain.entity.PlaceSmallCategory;
 import java.util.Optional;

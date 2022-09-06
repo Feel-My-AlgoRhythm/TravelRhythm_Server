@@ -5,10 +5,10 @@ import com.travelrhythm.domain.entity.PlaceBigCategory;
 import com.travelrhythm.domain.entity.PlaceDetail;
 import com.travelrhythm.domain.entity.PlaceSmallCategory;
 import com.travelrhythm.domain.entity.Region;
-import com.travelrhythm.domain.repository.PlaceBigCategoryRepository;
-import com.travelrhythm.domain.repository.PlaceDetailRepository;
-import com.travelrhythm.domain.repository.PlaceRepository;
-import com.travelrhythm.domain.repository.PlaceSmallCategoryRepository;
+import com.travelrhythm.domain.repository.category.PlaceBigCategoryRepository;
+import com.travelrhythm.domain.repository.place.PlaceDetailRepository;
+import com.travelrhythm.domain.repository.place.PlaceRepository;
+import com.travelrhythm.domain.repository.category.PlaceSmallCategoryRepository;
 import com.travelrhythm.domain.repository.RegionRepository;
 import com.travelrhythm.util.HttpUtil;
 import java.util.ArrayList;
@@ -93,7 +93,7 @@ public class BatchService {
 
   @Transactional
   public void addPoiDetailDataByNaver() {
-    List<Place> placeList = placeRepository.findTop100ByPlaceDetailOrderById(null);
+    List<Place> placeList = placeRepository.findTop250ByPlaceDetailOrderById(null);
 
     for (Place place: placeList) {
       log.info("addPoiDetailDataByNaver REQ : {}, {}", place.getId(), place.getName());

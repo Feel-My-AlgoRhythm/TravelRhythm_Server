@@ -1,9 +1,11 @@
 package com.travelrhythm.web.controller;
 
+import com.travelrhythm.web.dto.PlaceRequestDTO;
 import com.travelrhythm.web.dto.PlaceResponseDTO;
 import com.travelrhythm.web.service.PlaceService;
-import java.util.List;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +20,8 @@ public class PlaceController {
   private PlaceService placeService;
 
   @GetMapping
-  public ResponseEntity<List<PlaceResponseDTO>> getPlaces() {
-    return new ResponseEntity(placeService.getPlaces(), HttpStatus.OK);
+  public ResponseEntity<Page<PlaceResponseDTO>> getPlaces(@Valid PlaceRequestDTO dto) {
+    return new ResponseEntity(placeService.getPlaces(dto), HttpStatus.OK);
   }
 
 }

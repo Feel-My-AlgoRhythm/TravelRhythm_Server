@@ -5,7 +5,7 @@ import com.travelrhythm.domain.entity.PlaceDetail;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PlaceRepository extends JpaRepository<Place, Long> {
+public interface PlaceRepository extends JpaRepository<Place, Long>, PlaceRepositoryCustom {
 
   List<Place> findTop250ByPlaceDetailOrderById(PlaceDetail placeDetail);
 

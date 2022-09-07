@@ -18,7 +18,7 @@ public class QuartzConfig {
     return TriggerBuilder.newTrigger().forJob(findPoisByDatalabDetail)
         .withIdentity("Find_Pois_By_Datalab_Trigger")
         .withDescription("Find_Pois_By_Datalab_Trigger")
-        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/3 * * * ?"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/7 * * * ?"))
         .build();
   }
 
@@ -36,7 +36,7 @@ public class QuartzConfig {
     return TriggerBuilder.newTrigger().forJob(addPoiDetailDataByNaverDetail)
         .withIdentity("Add_Poi_Detail_Data_By_Naver_Trigger")
         .withDescription("Add_Poi_Detail_Data_By_Naver_Trigger")
-        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/30 * * * ?"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0/1 * * ?"))
         .build();
   }
 

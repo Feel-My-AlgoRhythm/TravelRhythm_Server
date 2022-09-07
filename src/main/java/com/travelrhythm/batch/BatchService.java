@@ -9,7 +9,7 @@ import com.travelrhythm.domain.repository.category.PlaceBigCategoryRepository;
 import com.travelrhythm.domain.repository.place.PlaceDetailRepository;
 import com.travelrhythm.domain.repository.place.PlaceRepository;
 import com.travelrhythm.domain.repository.category.PlaceSmallCategoryRepository;
-import com.travelrhythm.domain.repository.RegionRepository;
+import com.travelrhythm.domain.repository.region.RegionRepository;
 import com.travelrhythm.util.HttpUtil;
 import java.util.ArrayList;
 import java.util.List;

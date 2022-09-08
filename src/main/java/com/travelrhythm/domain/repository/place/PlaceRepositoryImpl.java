@@ -67,8 +67,7 @@ public class PlaceRepositoryImpl extends QuerydslRepositorySupport implements
         .innerJoin(place.placeBigCategory, bigCategory)
         .innerJoin(place.placeSmallCategory, smallCategory)
         .leftJoin(place.placeDetail, placeDetail)
-        .where(whereCondition)
-        .orderBy(place.id.desc());
+        .where(whereCondition);
 
     long totalCount = jpaQuery.fetchCount();
     List<PlaceResponseDTO> results = getQuerydsl().applyPagination(pageable, jpaQuery).fetch();

@@ -1,4 +1,4 @@
-package com.travelrhythm.domain.repository;
+package com.travelrhythm.domain.repository.place;
 
 import com.travelrhythm.domain.entity.PlaceDetail;
 import org.springframework.data.jpa.repository.JpaRepository;

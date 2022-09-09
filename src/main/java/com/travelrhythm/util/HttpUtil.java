@@ -26,10 +26,12 @@ public class HttpUtil {
   @Autowired
   private RestTemplate restTemplate;
 
-  public String findPoisByDatalab(String ssgCode, String bigCategory) {
+  public String findPoisByDatalab(String ssgCode, String bigCategory) throws RestClientException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
     LocalDate now = LocalDate.now();
     LocalDate startDate = now.minusYears(1);
-
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     map.add("SGG_CD", ssgCode);
     map.add("txtSGG_CD", "1");
@@ -40,7 +42,15 @@ public class HttpUtil {
     map.add("srchAreaDate", "1");
     map.add("qid", "BDT_03_04_003");
 
-    return postInterface(DATALAB_API_PRERIX + "/visualize/getTempleteData.do", map);
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+    ResponseEntity<String> response = restTemplate.postForEntity(
+        URI.create(DATALAB_API_PRERIX + "/visualize/getTempleteData.do"), request, String.class);
+
+    log.info("HTTP RES : {} | {}", response.getStatusCodeValue(), response.getBody());
+    if (response.getStatusCodeValue() != 200) {
+      throw new RestClientException("Invalid Http Status Code");
+    }
+    return response.getBody();
   }
 
   public String findPoiDetailDataByNaver(String placeName) throws RestClientException {
@@ -50,32 +60,10 @@ public class HttpUtil {
         NAVER_MAP_SEARCH_API_PREFIX + basicParams + "&query=" + placeName
         , String.class);
 
-    log.info("HTTP RES : {} | {}",
-        response.getStatusCodeValue(), response.getBody());
-
+    log.info("HTTP RES : {} | {}", response.getStatusCodeValue(), response.getBody());
     if (response.getStatusCodeValue() != 200) {
       throw new RestClientException("Invalid Http Status Code");
     }
     return response.getBody();
-  }
-
-  private String postInterface(String path, MultiValueMap dto) {
-    // TODO Exception 처리
-    try {
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(dto, headers);
-
-      ResponseEntity<String> response = restTemplate.postForEntity
-          (URI.create(path), request, String.class);
-
-      if (response.getStatusCodeValue() != 200) {
-        throw new HttpException();
-      }
-      return response.getBody();
-    } catch (Exception e) {
-      return e.getMessage();
-    }
   }
 }

@@ -18,7 +18,7 @@ public class QuartzConfig {
     return TriggerBuilder.newTrigger().forJob(findPoisByDatalabDetail)
         .withIdentity("Find_Pois_By_Datalab_Trigger")
         .withDescription("Find_Pois_By_Datalab_Trigger")
-        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/3 * * * ?"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/10 * * * ?"))
         .build();
   }
 

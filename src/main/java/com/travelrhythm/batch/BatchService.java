@@ -43,26 +43,29 @@ public class BatchService {
 
   @Transactional
   public void findPoisByDatalab() {
+    // get region and category list for requesting to get place list
     List<Region> regionList = regionRepository.findAll();
     List<PlaceBigCategory> categoryList = placeBigCategoryRepository.findAll();
 
-    // get region and category randomly
-    int randomValue = (int)(Math.random() * regionList.size());
+    //TODO get one randomly
+    // https://dazbee.tistory.com/49?category=1040314
+    int randomValue = (int) (Math.random() * regionList.size());
     Region region = regionList.get(randomValue);
-    randomValue = (int)(Math.random() * categoryList.size());
+    randomValue = (int) (Math.random() * categoryList.size());
     PlaceBigCategory bigCategory = categoryList.get(randomValue);
-
-    log.info("findPoisByDatalab REQ : {} {} | {}", region.getSsgCode(), region.getSsgName(), bigCategory.getName());
-    String responseValue = httpUtil.findPoisByDatalab(region.getSsgCode(), bigCategory.getName());
-    log.info("findPoisByDatalab RES : {}", responseValue);
 
     List<Place> placeListForSave = new ArrayList<>();
     try {
+      log.info("findPoisByDatalab REQ : {} {} | {}", region.getSsgCode(), region.getSsgName(),
+          bigCategory.getName());
+      String responseValue = httpUtil.findPoisByDatalab(region.getSsgCode(), bigCategory.getName());
+
       JSONParser jsonParser = new JSONParser();
       JSONObject jsonObj = (JSONObject) jsonParser.parse(responseValue);
       JSONArray jsonArray = (JSONArray) jsonObj.get("list");
-      for (int i=0; i<jsonArray.size(); ++i) {
-        JSONObject jo = (JSONObject)jsonArray.get(i);
+
+      for (int i = 0; i < jsonArray.size(); ++i) {
+        JSONObject jo = (JSONObject) jsonArray.get(i);
 
         String smallCategoryValue = jo.get("KTO_CATE_SCLS_NM").toString();
         PlaceSmallCategory smallCategory = placeSmallCategoryRepository
@@ -77,26 +80,39 @@ public class BatchService {
           placeSmallCategoryRepository.save(smallCategory);
         }
 
-        Place place = new Place();
-        place.setName(jo.get("ITS_BRO_NM").toString());
-        place.setAddressRoadName(jo.get("ADDR_ROAD_NM").toString());
-        place.setPlaceBigCategory(bigCategory);
-        place.setPlaceSmallCategory(smallCategory);
-        place.setRegion(region);
-        placeListForSave.add(place);
+        String name = jo.get("ITS_BRO_NM").toString();
+        String addressRoadName = jo.get("ADDR_ROAD_NM").toString();
+        Place place = placeRepository.findByNameAndAddressRoadName(name, addressRoadName)
+            .orElse(null);
+
+        // add new place
+        if (place == null) {
+          Place newPlace = new Place();
+          newPlace.setName(name);
+          newPlace.setAddressRoadName(addressRoadName);
+          newPlace.setNumberOfPlaceDetailRequest(0);
+          newPlace.setPlaceBigCategory(bigCategory);
+          newPlace.setPlaceSmallCategory(smallCategory);
+          newPlace.setRegion(region);
+          placeListForSave.add(newPlace);
+        }
       }
+    } catch (RestClientException e) {
+      log.error("RestClientException: {}", e.getMessage());
     } catch (ParseException e) {
-      log.error(e.getMessage());
+      log.error("ParseException: {}", e.getMessage());
     } catch (Exception e) {
-      log.error(e.getMessage());
+      log.error("UndefinedException: {}", e.getMessage());
     }
+    log.info("JOB [{}] ended : total new place: {}", this.getClass().getSimpleName(), placeListForSave.size());
     placeRepository.saveAll(placeListForSave);
   }
 
   @Transactional
   public void addPoiDetailDataByNaver() {
     // get place list without detail info
-    List<Place> placeList = placeRepository.findTop200ByPlaceDetailOrderByNumberOfPlaceDetailRequest(null);
+    List<Place> placeList = placeRepository
+        .findTop200ByPlaceDetailOrderByNumberOfPlaceDetailRequest(null);
 
     for (Place place : placeList) {
       PlaceDetail placeDetail = getPlaceDetailTransaction(place);
@@ -130,7 +146,7 @@ public class BatchService {
       placeDetail.setX(dataObj.get("x").toString());
       placeDetail.setY(dataObj.get("y").toString());
       placeDetailRepository.save(placeDetail);
-    } catch(RestClientException e) {
+    } catch (RestClientException e) {
       log.error("RestClientException: {}", e.getMessage());
     } catch (ParseException e) {
       log.error("ParseException: {}", e.getMessage());

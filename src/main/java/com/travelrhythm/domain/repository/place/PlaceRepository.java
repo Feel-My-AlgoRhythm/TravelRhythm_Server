@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlaceRepository extends JpaRepository<Place, Long>, PlaceRepositoryCustom {
 
-  List<Place> findTop250ByPlaceDetailOrderByIdDesc(PlaceDetail placeDetail);
+  List<Place> findTop200ByPlaceDetailOrderByNumberOfPlaceDetailRequest(PlaceDetail placeDetail);
 
 }

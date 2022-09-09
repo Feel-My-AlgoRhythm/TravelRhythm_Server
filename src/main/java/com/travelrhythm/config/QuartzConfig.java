@@ -36,7 +36,7 @@ public class QuartzConfig {
     return TriggerBuilder.newTrigger().forJob(addPoiDetailDataByNaverDetail)
         .withIdentity("Add_Poi_Detail_Data_By_Naver_Trigger")
         .withDescription("Add_Poi_Detail_Data_By_Naver_Trigger")
-        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/30 * * * ?"))
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0/1 * * ?"))
         .build();
   }
 

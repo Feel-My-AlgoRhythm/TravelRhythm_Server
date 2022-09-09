@@ -20,7 +20,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 
 @Slf4j
 @Service
@@ -96,34 +98,46 @@ public class BatchService {
     // get place list without detail info
     List<Place> placeList = placeRepository.findTop200ByPlaceDetailOrderByNumberOfPlaceDetailRequest(null);
 
-    for (Place place: placeList) {
-      log.info("addPoiDetailDataByNaver REQ : {}, {}", place.getId(), place.getName());
-      String responseValue = httpUtil.findPoiDetailDataByNaver(place.getName());
-      log.info("addPoiDetailDataByNaver RES : {}", responseValue);
-
-      try {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObj = (JSONObject) jsonParser.parse(responseValue);
-        JSONObject resultObj = (JSONObject) jsonParser.parse(jsonObj.get("result").toString());
-        JSONObject placeObj = (JSONObject) jsonParser.parse(resultObj.get("place").toString());
-        JSONObject dataObj = (JSONObject) ((JSONArray) placeObj.get("list")).get(0);
-
-        PlaceDetail placeDetail = new PlaceDetail();
-        placeDetail.setData(dataObj);
-        placeDetail.setNaverId(dataObj.get("id").toString());
-        placeDetail.setPosExact(dataObj.get("posExact").toString());
-        placeDetail.setX(dataObj.get("x").toString());
-        placeDetail.setY(dataObj.get("y").toString());
-        placeDetailRepository.save(placeDetail);
-
+    for (Place place : placeList) {
+      PlaceDetail placeDetail = getPlaceDetailTransaction(place);
+      // set detail info
+      if (placeDetail != null) {
         place.setPlaceDetail(placeDetail);
-        placeRepository.save(place);
-      } catch (ParseException e) {
-        log.error(e.getMessage());
-      } catch (Exception e) {
-        log.error(e.getMessage());
       }
+      // set number of request
+      place.setNumberOfPlaceDetailRequest(place.getNumberOfPlaceDetailRequest() + 1);
+      placeRepository.save(place);
     }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public PlaceDetail getPlaceDetailTransaction(Place place) {
+    PlaceDetail placeDetail = null;
+    try {
+      log.info("HTTP REQ : {}, {}", place.getId(), place.getName());
+      String responseValue = httpUtil.findPoiDetailDataByNaver(place.getName());
+
+      JSONParser jsonParser = new JSONParser();
+      JSONObject jsonObj = (JSONObject) jsonParser.parse(responseValue);
+      JSONObject resultObj = (JSONObject) jsonParser.parse(jsonObj.get("result").toString());
+      JSONObject placeObj = (JSONObject) jsonParser.parse(resultObj.get("place").toString());
+      JSONObject dataObj = (JSONObject) ((JSONArray) placeObj.get("list")).get(0);
+
+      placeDetail = new PlaceDetail();
+      placeDetail.setData(dataObj);
+      placeDetail.setNaverId(dataObj.get("id").toString());
+      placeDetail.setPosExact(dataObj.get("posExact").toString());
+      placeDetail.setX(dataObj.get("x").toString());
+      placeDetail.setY(dataObj.get("y").toString());
+      placeDetailRepository.save(placeDetail);
+    } catch(RestClientException e) {
+      log.error("RestClientException: {}", e.getMessage());
+    } catch (ParseException e) {
+      log.error("ParseException: {}", e.getMessage());
+    } catch (Exception e) {
+      log.error("UndefinedException: {}", e.getMessage());
+    }
+    return placeDetail;
   }
 
 }

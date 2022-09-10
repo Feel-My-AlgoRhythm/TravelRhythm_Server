@@ -1,6 +1,7 @@
 package com.travelrhythm.domain.repository.place;
 
 import static com.travelrhythm.domain.entity.QPlace.place;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -13,6 +14,7 @@ import com.travelrhythm.domain.entity.QRegion;
 import com.travelrhythm.domain.repository.place.param.PlaceSearchParam;
 import com.travelrhythm.web.dto.PlaceResponseDTO;
 import com.travelrhythm.web.dto.QPlaceResponseDTO;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -76,11 +78,20 @@ public class PlaceRepositoryImpl extends QuerydslRepositorySupport implements
 
   private BooleanBuilder getWhereCondition(PlaceSearchParam param) {
     BooleanBuilder whereCondition = new BooleanBuilder();
-    if (param.getRegionId() != null) {
-      whereCondition.and(region.id.eq(param.getRegionId()));
+
+    if (!isEmpty(param.getRegionIdList())) {
+      ArrayList<Long> idList = new ArrayList<>();
+      for (int i = 0; i < param.getRegionIdList().size(); i++) {
+        idList.add(param.getRegionIdList().get(i));
+      }
+      whereCondition.and(region.id.in(idList));
     }
-    if (param.getBigCategoryId() != null) {
-      whereCondition.and(bigCategory.id.eq(param.getBigCategoryId()));
+    if (!isEmpty(param.getBigCategoryIdList())) {
+      ArrayList<Long> idList = new ArrayList<>();
+      for (int i = 0; i < param.getBigCategoryIdList().size(); i++) {
+        idList.add(param.getBigCategoryIdList().get(i));
+      }
+      whereCondition.and(bigCategory.id.in(idList));
     }
     if (param.getSmallCategoryId() != null) {
       whereCondition.and(smallCategory.id.eq(param.getSmallCategoryId()));

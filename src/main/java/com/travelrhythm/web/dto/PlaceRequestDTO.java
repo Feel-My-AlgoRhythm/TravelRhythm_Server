@@ -12,4 +12,9 @@ public class PlaceRequestDTO extends PagingDTO {
   private List<Long> bigCategoryIdList;
   private Long smallCategoryId;
 
+  private Double startX;
+  private Double endX;
+  private Double startY;
+  private Double endY;
+
 }

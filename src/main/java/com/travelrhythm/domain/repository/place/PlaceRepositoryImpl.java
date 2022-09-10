@@ -96,6 +96,18 @@ public class PlaceRepositoryImpl extends QuerydslRepositorySupport implements
     if (param.getSmallCategoryId() != null) {
       whereCondition.and(smallCategory.id.eq(param.getSmallCategoryId()));
     }
+    if (param.getStartX() != null) {
+      whereCondition.and(placeDetail.x.goe(param.getStartX()));
+    }
+    if (param.getEndX() != null) {
+      whereCondition.and(placeDetail.x.loe(param.getEndX()));
+    }
+    if (param.getStartY() != null) {
+      whereCondition.and(placeDetail.y.goe(param.getStartY()));
+    }
+    if (param.getEndY() != null) {
+      whereCondition.and(placeDetail.y.loe(param.getEndY()));
+    }
     return whereCondition;
   }
 

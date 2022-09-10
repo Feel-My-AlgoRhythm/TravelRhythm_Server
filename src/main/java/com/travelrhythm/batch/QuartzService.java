@@ -143,8 +143,8 @@ public class QuartzService {
       placeDetail.setData(dataObj);
       placeDetail.setNaverId(dataObj.get("id").toString());
       placeDetail.setPosExact(dataObj.get("posExact").toString());
-      placeDetail.setX(dataObj.get("x").toString());
-      placeDetail.setY(dataObj.get("y").toString());
+      placeDetail.setX(Double.parseDouble(dataObj.get("x").toString()));
+      placeDetail.setY(Double.parseDouble(dataObj.get("y").toString()));
       placeDetailRepository.save(placeDetail);
     } catch (RestClientException e) {
       log.error("RestClientException: {}", e.getMessage());

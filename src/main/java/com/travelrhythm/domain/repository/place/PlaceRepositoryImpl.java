@@ -45,6 +45,9 @@ public class PlaceRepositoryImpl extends QuerydslRepositorySupport implements
 
     BooleanBuilder whereCondition = getWhereCondition(param);
 
+    // place detail is necessary
+    whereCondition.and(place.placeDetail.isNotNull());
+
     JPAQuery<PlaceResponseDTO> jpaQuery = query
         .select(new QPlaceResponseDTO(
             place.id,

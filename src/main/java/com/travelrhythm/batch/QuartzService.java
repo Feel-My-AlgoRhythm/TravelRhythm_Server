@@ -26,7 +26,7 @@ import org.springframework.web.client.RestClientException;
 
 @Slf4j
 @Service
-public class BatchService {
+public class QuartzService {
 
   @Autowired
   private RegionRepository regionRepository;
@@ -42,7 +42,7 @@ public class BatchService {
   private HttpUtil httpUtil;
 
   @Transactional
-  public void findPoisByDatalab() {
+  public void findPlaceListByDatalab() {
     // get region and category list for requesting to get place list
     List<Region> regionList = regionRepository.findAll();
     List<PlaceBigCategory> categoryList = placeBigCategoryRepository.findAll();
@@ -56,9 +56,9 @@ public class BatchService {
 
     List<Place> placeListForSave = new ArrayList<>();
     try {
-      log.info("findPoisByDatalab REQ : {} {} | {}", region.getSsgCode(), region.getSsgName(),
+      log.info("HTTP REQ : {} {} | {}", region.getSsgCode(), region.getSsgName(),
           bigCategory.getName());
-      String responseValue = httpUtil.findPoisByDatalab(region.getSsgCode(), bigCategory.getName());
+      String responseValue = httpUtil.findPlaceListByDatalab(region.getSsgCode(), bigCategory.getName());
 
       JSONParser jsonParser = new JSONParser();
       JSONObject jsonObj = (JSONObject) jsonParser.parse(responseValue);
@@ -109,7 +109,7 @@ public class BatchService {
   }
 
   @Transactional
-  public void addPoiDetailDataByNaver() {
+  public void findPlaceDetailByNaver() {
     // get place list without detail info
     List<Place> placeList = placeRepository
         .findTop200ByPlaceDetailOrderByNumberOfPlaceDetailRequest(null);
@@ -131,7 +131,7 @@ public class BatchService {
     PlaceDetail placeDetail = null;
     try {
       log.info("HTTP REQ : {}, {}", place.getId(), place.getName());
-      String responseValue = httpUtil.findPoiDetailDataByNaver(place.getName());
+      String responseValue = httpUtil.findPlaceDetailByNaver(place.getName());
 
       JSONParser jsonParser = new JSONParser();
       JSONObject jsonObj = (JSONObject) jsonParser.parse(responseValue);

@@ -26,7 +26,7 @@ public class HttpUtil {
   @Autowired
   private RestTemplate restTemplate;
 
-  public String findPoisByDatalab(String ssgCode, String bigCategory) throws RestClientException {
+  public String findPlaceListByDatalab(String ssgCode, String bigCategory) throws RestClientException {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -53,7 +53,7 @@ public class HttpUtil {
     return response.getBody();
   }
 
-  public String findPoiDetailDataByNaver(String placeName) throws RestClientException {
+  public String findPlaceDetailByNaver(String placeName) throws RestClientException {
     String basicParams = "?caller=pcweb&type=all&page=1&displayCount=1&isPlaceRecommendationReplace=true&lang=ko";
 
     ResponseEntity<String> response = restTemplate.getForEntity(

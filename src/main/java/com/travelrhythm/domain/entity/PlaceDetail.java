@@ -26,8 +26,8 @@ public class PlaceDetail {
 
   private String naverId;
   private String posExact;
-  private String x;
-  private String y;
+  private Double x;
+  private Double y;
 
   @Type(type = "json")
   @Column(name = "data", columnDefinition = "json")

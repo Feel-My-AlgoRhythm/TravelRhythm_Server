@@ -28,15 +28,15 @@ public class PlaceResponseDTO {
   private Long placeDetailId;
   private String naverId;
   private String posExact;
-  private String x;
-  private String y;
+  private Double x;
+  private Double y;
   private Map<String, Object> placeDetailData;
 
   @QueryProjection
   public PlaceResponseDTO(Long id, String name, String addressRoadName, Long regionId,
       String regionCode, String regionName, Long bigCategoryId, String bigCategoryName,
       Long smallCategoryId, String smallCategoryName, Long placeDetailId, String naverId,
-      String posExact, String x, String y,
+      String posExact, Double x, Double y,
       Map<String, Object> placeDetailData) {
     this.id = id;
     this.name = name;

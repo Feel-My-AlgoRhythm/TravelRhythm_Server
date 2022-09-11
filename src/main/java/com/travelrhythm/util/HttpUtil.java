@@ -3,6 +3,7 @@ package com.travelrhythm.util;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -12,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Component
 public class HttpUtil {
 
@@ -23,10 +26,12 @@ public class HttpUtil {
   @Autowired
   private RestTemplate restTemplate;
 
-  public String findPoisByDatalab(String ssgCode, String bigCategory) {
+  public String findPlaceListByDatalab(String ssgCode, String bigCategory) throws RestClientException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
     LocalDate now = LocalDate.now();
     LocalDate startDate = now.minusYears(1);
-
     MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     map.add("SGG_CD", ssgCode);
     map.add("txtSGG_CD", "1");
@@ -37,45 +42,28 @@ public class HttpUtil {
     map.add("srchAreaDate", "1");
     map.add("qid", "BDT_03_04_003");
 
-    return postInterface(DATALAB_API_PRERIX + "/visualize/getTempleteData.do", map);
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+    ResponseEntity<String> response = restTemplate.postForEntity(
+        URI.create(DATALAB_API_PRERIX + "/visualize/getTempleteData.do"), request, String.class);
+
+    log.info("HTTP RES : {} | {}", response.getStatusCodeValue(), response.getBody());
+    if (response.getStatusCodeValue() != 200) {
+      throw new RestClientException("Invalid Http Status Code");
+    }
+    return response.getBody();
   }
 
-  public String findPoiDetailDataByNaver(String placeName) {
-    // TODO Exception 처리
-    // TODO detail 요청 횟수 제한? 검색 결과가 없는 경우와 응답코드 5xx 분기 필요
-    try {
-      String basicParams = "?caller=pcweb&type=all&page=1&displayCount=1&isPlaceRecommendationReplace=true&lang=ko";
+  public String findPlaceDetailByNaver(String placeName) throws RestClientException {
+    String basicParams = "?caller=pcweb&type=all&page=1&displayCount=1&isPlaceRecommendationReplace=true&lang=ko";
 
-      ResponseEntity<String> response = restTemplate.getForEntity(
-          NAVER_MAP_SEARCH_API_PREFIX + basicParams + "&query=" + placeName
-          , String.class);
+    ResponseEntity<String> response = restTemplate.getForEntity(
+        NAVER_MAP_SEARCH_API_PREFIX + basicParams + "&query=" + placeName
+        , String.class);
 
-      if (response.getStatusCodeValue() != 200) {
-        throw new HttpException();
-      }
-      return response.getBody();
-    } catch (Exception e) {
-      return e.getMessage();
+    log.info("HTTP RES : {} | {}", response.getStatusCodeValue(), response.getBody());
+    if (response.getStatusCodeValue() != 200) {
+      throw new RestClientException("Invalid Http Status Code");
     }
-  }
-
-  private String postInterface(String path, MultiValueMap dto) {
-    // TODO Exception 처리
-    try {
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(dto, headers);
-
-      ResponseEntity<String> response = restTemplate.postForEntity
-          (URI.create(path), request, String.class);
-
-      if (response.getStatusCodeValue() != 200) {
-        throw new HttpException();
-      }
-      return response.getBody();
-    } catch (Exception e) {
-      return e.getMessage();
-    }
+    return response.getBody();
   }
 }

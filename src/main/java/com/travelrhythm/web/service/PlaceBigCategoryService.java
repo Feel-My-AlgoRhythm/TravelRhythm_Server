@@ -15,6 +15,7 @@ public class PlaceBigCategoryService {
   @Autowired
   private PlaceBigCategoryRepository placeBigCategoryRepository;
 
+  //TODO - service exception handler
   public Page<PlaceBigCategoryResponseDTO> getPlaceBigCategories(PagingDTO dto) {
     return placeBigCategoryRepository.findAllPlaceBigCategories(dto.getPageRequest());
   }

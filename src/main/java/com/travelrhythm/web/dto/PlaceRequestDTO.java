@@ -1,5 +1,6 @@
 package com.travelrhythm.web.dto;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +8,13 @@ import lombok.Setter;
 @Setter
 public class PlaceRequestDTO extends PagingDTO {
 
-  private Long regionId;
-  private Long bigCategoryId;
+  private List<Long> regionIdList;
+  private List<Long> bigCategoryIdList;
   private Long smallCategoryId;
+
+  private Double startX;
+  private Double endX;
+  private Double startY;
+  private Double endY;
 
 }
